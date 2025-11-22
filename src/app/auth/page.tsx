@@ -224,13 +224,15 @@ export default function AuthPage() {
       <div className="orbital-gradient" aria-hidden />
       <div className="grid-overlay" aria-hidden />
 
-      {/* Hidden Dev Bypass Button - Triple click bottom right corner */}
+      {/* Hidden Dev Bypass Button - Bottom right corner (hover to see) */}
       <button
         onClick={handleDevBypass}
-        className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-transparent opacity-0 transition-opacity hover:opacity-100"
+        className="fixed bottom-4 right-4 z-50 h-10 w-10 rounded-full bg-red-500/20 border border-red-500/40 opacity-20 transition-all hover:opacity-100 hover:scale-110 hover:bg-red-500/40"
         aria-label="Developer bypass"
-        title="Dev Bypass (Triple click)"
-      />
+        title="Dev Bypass - Click to skip authentication"
+      >
+        <span className="text-xs text-red-400 font-bold">DEV</span>
+      </button>
 
       {/* Verified Animation Overlay */}
       <AnimatePresence>
