@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   Bandage,
@@ -14,6 +15,12 @@ import {
   Sparkles,
   Stethoscope,
   Syringe,
+  X,
+  ChevronRight,
+  ChevronLeft,
+  CheckCircle2,
+  ShoppingCart,
+  LogOut,
 } from "lucide-react";
 
 const actions = [
@@ -74,7 +81,79 @@ const quickSteps = [
   },
 ];
 
+const previewSteps = [
+  {
+    id: 1,
+    title: "Authenticate Yourself",
+    description: "Scan your Student ID barcode or use Phone OTP to verify your identity securely.",
+    icon: Fingerprint,
+    details: "Quick verification process that takes less than 3 seconds. Your identity is protected with masked tokens.",
+  },
+  {
+    id: 2,
+    title: "AI Health Analysis",
+    description: "Upload a photo or describe your symptoms. Our AI analyzes and provides safe first-aid guidance.",
+    icon: Bot,
+    details: "The AI works with doctors and nurses to give you step-by-step first-aid instructions tailored to your needs.",
+  },
+  {
+    id: 3,
+    title: "Upload or Scan Symptoms",
+    description: "Capture the affected area with the machine camera or upload from your phone.",
+    icon: Camera,
+    details: "Clear photos help the AI understand your condition better and provide more accurate recommendations.",
+  },
+  {
+    id: 4,
+    title: "View Recommendations",
+    description: "See AI-assisted first-aid suggestions, severity levels, and recommended items.",
+    icon: Stethoscope,
+    details: "Get personalized guidance with confidence indicators and safety alerts for severe cases.",
+  },
+  {
+    id: 5,
+    title: "Purchase Items Directly",
+    description: "Buy essential first-aid items like bandages, antiseptic, pain relief, and more instantly.",
+    icon: ShoppingCart,
+    details: "No waiting, no analysis needed. Quick buy option for immediate access to essential items.",
+  },
+  {
+    id: 6,
+    title: "Receipt Generation",
+    description: "Digital receipts are automatically generated and sent to your registered phone number.",
+    icon: ReceiptText,
+    details: "Keep a record of your purchases and care instructions. Download or print anytime.",
+  },
+  {
+    id: 7,
+    title: "Safe Logout",
+    description: "Automatically logged out after inactivity for your security and privacy.",
+    icon: LogOut,
+    details: "Your session is secure. All data is protected with masked student tokens only.",
+  },
+];
+
 export default function Home() {
+  const [showPreview, setShowPreview] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  function nextStep() {
+    if (currentStep < previewSteps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  }
+
+  function closePreview() {
+    setShowPreview(false);
+    setCurrentStep(0);
+  }
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
       <div className="orbital-gradient" aria-hidden />
@@ -137,6 +216,7 @@ export default function Home() {
             </Link>
 
             <motion.button
+              onClick={() => setShowPreview(true)}
               className="rounded-full border border-white/30 px-6 py-3 text-base font-medium text-slate-100 transition hover:border-cyan-300 hover:text-white"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -293,6 +373,168 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Preview Flow Modal */}
+      <AnimatePresence>
+        {showPreview && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closePreview}
+            />
+            <motion.div
+              className="fixed left-1/2 top-1/2 z-50 w-full max-w-4xl -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/20 bg-slate-900 p-6 shadow-2xl sm:p-8"
+              initial={{ opacity: 0, scale: 0.9, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-semibold text-white">Want to see how this machine works?</h2>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Get a quick walkthrough before you begin
+                  </p>
+                </div>
+                <button
+                  onClick={closePreview}
+                  className="rounded-full bg-white/10 p-2 text-slate-400 transition hover:bg-white/20 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="mb-6">
+                <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
+                  <span>Step {currentStep + 1} of {previewSteps.length}</span>
+                  <span>{Math.round(((currentStep + 1) / previewSteps.length) * 100)}%</span>
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-cyan-400 to-blue-500"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${((currentStep + 1) / previewSteps.length) * 100}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+              </div>
+
+              {/* Step Content */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="mb-6"
+                >
+                  <div className="flex flex-col gap-6 sm:flex-row">
+                    {/* Icon */}
+                    <div className="flex shrink-0 items-center justify-center sm:w-32">
+                      <motion.div
+                        className="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-cyan-400 to-blue-500 shadow-lg shadow-cyan-500/50"
+                        initial={{ scale: 0.8, rotate: -10 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ duration: 0.5, type: "spring" }}
+                      >
+                        {(() => {
+                          const Icon = previewSteps[currentStep].icon;
+                          return <Icon className="h-12 w-12 text-white" />;
+                        })()}
+                      </motion.div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1">
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="rounded-full bg-cyan-400/20 px-3 py-1 text-xs font-semibold text-cyan-300">
+                          Step {previewSteps[currentStep].id}
+                        </span>
+                      </div>
+                      <h3 className="mb-3 text-2xl font-semibold text-white">
+                        {previewSteps[currentStep].title}
+                      </h3>
+                      <p className="mb-4 text-lg text-slate-300">
+                        {previewSteps[currentStep].description}
+                      </p>
+                      <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-4">
+                        <p className="text-sm text-cyan-200">
+                          {previewSteps[currentStep].details}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Navigation */}
+              <div className="flex items-center justify-between gap-4">
+                <motion.button
+                  onClick={prevStep}
+                  disabled={currentStep === 0}
+                  className="flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 font-medium text-slate-300 transition disabled:opacity-30 disabled:cursor-not-allowed hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300"
+                  whileHover={currentStep > 0 ? { scale: 1.05 } : {}}
+                  whileTap={currentStep > 0 ? { scale: 0.95 } : {}}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </motion.button>
+
+                <div className="flex gap-2">
+                  {previewSteps.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentStep(index)}
+                      className={`h-2 rounded-full transition ${
+                        index === currentStep
+                          ? "w-8 bg-cyan-400"
+                          : "w-2 bg-white/20 hover:bg-white/40"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {currentStep < previewSteps.length - 1 ? (
+                  <motion.button
+                    onClick={nextStep}
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    onClick={closePreview}
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-6 py-3 font-semibold text-white shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <CheckCircle2 className="h-4 w-4" />
+                    Got It!
+                  </motion.button>
+                )}
+              </div>
+
+              {/* Footer Note */}
+              <div className="mt-6 border-t border-white/10 pt-4">
+                <p className="text-center text-xs text-slate-400">
+                  <ShieldCheck className="mr-1 inline h-3 w-3" />
+                  Your data is never shared during the preview. This is only a demonstration.
+                </p>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
