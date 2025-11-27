@@ -57,6 +57,8 @@ export async function GET(request: NextRequest) {
       fullName: data.fullName || null,
       number: data.number || null,
       language: data.language || "English",
+      age: data.age || null,
+      allergy: data.allergy || null,
       message: data.message,
     });
   } catch (error) {

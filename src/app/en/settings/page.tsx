@@ -28,7 +28,7 @@ import Link from "next/link";
 export default function SettingsPage() {
   const router = useRouter();
   const { language, setLanguage, t } = useLanguage();
-  const [profile, setProfile] = useState<{ fullName: string; uid: string; number: string } | null>(null);
+  const [profile, setProfile] = useState<{ fullName: string; uid: string; number: string; age: number | null; allergy: string | null } | null>(null);
 
   const [smsAlerts, setSmsAlerts] = useState(true);
   const [emailReceipts, setEmailReceipts] = useState(true);
@@ -45,7 +45,9 @@ export default function SettingsPage() {
             setProfile({
               fullName: data.fullName,
               uid: data.uid,
-              number: data.number
+              number: data.number,
+              age: data.age,
+              allergy: data.allergy
             });
           }
         })
@@ -110,18 +112,28 @@ export default function SettingsPage() {
 
             <div className="space-y-4">
               <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-sm text-slate-400">{t("settings.name")}</div>
+                <div className="mb-2 text-sm text-slate-400">{t("Name")}</div>
                 <div className="text-lg font-semibold text-white">{profile?.fullName || "Loading..."}</div>
               </div>
 
               <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-sm text-slate-400">{t("settings.studentId")}</div>
+                <div className="mb-2 text-sm text-slate-400">{t("Student ID")}</div>
                 <div className="text-lg font-semibold text-white">{profile?.uid || "Loading..."}</div>
               </div>
 
               <div className="rounded-xl border border-white/10 bg-white/5 p-4">
                 <div className="mb-2 text-sm text-slate-400">{t("settings.registeredNumber")}</div>
-                <div className="text-lg font-semibold text-white">{profile?.number || "Loading..."}</div>
+                <div className="text-lg font-semibold text-white">{profile?.number || " "}</div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                <div className="mb-2 text-sm text-slate-400">{t("Age")}</div>
+                <div className="text-lg font-semibold text-white">{profile?.age || "Loading..."}</div>
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                <div className="mb-2 text-sm text-slate-400">{t("Allergy")}</div>
+                <div className="text-lg font-semibold text-white">{profile?.allergy || "None"}</div>
               </div>
 
               <div className="rounded-xl border border-white/10 bg-white/5 p-4">
@@ -193,14 +205,6 @@ export default function SettingsPage() {
                   ))}
                 </div>
               </div>
-
-              <motion.button
-                className="w-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {t("settings.apply")}
-              </motion.button>
             </div>
           </div>
         </motion.section>

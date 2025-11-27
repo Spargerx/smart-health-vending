@@ -26,7 +26,7 @@ import Link from "next/link";
 
 export default function SettingsPage() {
     const router = useRouter();
-    const [profile, setProfile] = useState<{ fullName: string; uid: string; number: string } | null>(null);
+    const [profile, setProfile] = useState<{ fullName: string; uid: string; number: string; age: number | null; allergy: string | null } | null>(null);
 
     const [smsAlerts, setSmsAlerts] = useState(true);
     const [emailReceipts, setEmailReceipts] = useState(true);
@@ -36,14 +36,16 @@ export default function SettingsPage() {
     useEffect(() => {
         const uid = sessionStorage.getItem("studentId");
         if (uid) {
-            fetch(`/api/student-profile/${encodeURIComponent(uid)}`)
+            fetch(`/api/student-profile?uid=${encodeURIComponent(uid)}`)
                 .then((res) => res.json())
                 .then((data) => {
                     if (data.success) {
                         setProfile({
                             fullName: data.fullName,
                             uid: data.uid,
-                            number: data.number
+                            number: data.number,
+                            age: data.age,
+                            allergy: data.allergy
                         });
                     }
                 })
@@ -127,6 +129,16 @@ export default function SettingsPage() {
                                 <div className="text-lg font-semibold text-white">22 Nov 2025, 3:42 PM</div>
                             </div>
 
+                            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                <div className="mb-2 text-sm text-slate-400">उम्र</div>
+                                <div className="text-lg font-semibold text-white">{profile?.age || "लोड हो रहा है..."}</div>
+                            </div>
+
+                            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                <div className="mb-2 text-sm text-slate-400">एलर्जी</div>
+                                <div className="text-lg font-semibold text-white">{profile?.allergy || "कोई नहीं"}</div>
+                            </div>
+
                             <div className="flex gap-3">
                                 <motion.button
                                     className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-3 font-medium text-slate-300 transition hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300"
@@ -194,14 +206,6 @@ export default function SettingsPage() {
                                     </motion.button>
                                 </div>
                             </div>
-
-                            <motion.button
-                                className="w-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg"
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                लागू करें
-                            </motion.button>
                         </div>
                     </div>
                 </motion.section>
