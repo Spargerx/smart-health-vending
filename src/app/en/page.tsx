@@ -152,7 +152,7 @@ export default function Home() {
                             {"Welcome to CureGenie - The Smart Health Assistance Vending Machine"}
                         </h1>
                         <h2 className="max-w-2xl text-xl font-light text-slate-200 sm:text-xl">
-                            CureGenie combines intelligent triage, remote physicians, and ready-to-buy essentials so you can act within seconds.
+                            {"CureGenie combines intelligent triage, remote physicians, and ready-to-buy essentials so you can act within seconds."}
                         </h2>
                     </div>
 

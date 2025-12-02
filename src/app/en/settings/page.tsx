@@ -140,7 +140,7 @@ export default function SettingsPage() {
 
               <div className="rounded-xl border border-white/10 bg-white/5 p-4">
                 <div className="mb-2 text-sm text-slate-400">{"Verified On"}</div>
-                <div className="text-lg font-semibold text-white">22 Nov 2025, 3:42 PM</div>
+                <div className="text-lg font-semibold text-white">{new Date().toLocaleString('en-US')}</div>
               </div>
 
               <div className="flex gap-3">

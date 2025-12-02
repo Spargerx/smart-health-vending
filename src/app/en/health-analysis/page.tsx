@@ -190,7 +190,6 @@ export default function HealthAnalysisPage() {
     setTimeout(() => {
       setIsAnalyzing(false);
       // Navigate to results page or show results
-      console.log("Analysis complete", suggestions);
     }, 3000);
   }
 

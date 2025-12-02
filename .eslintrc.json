@@ -1,0 +1,10 @@
+{
+    "extends": "next/core-web-vitals",
+    "ignorePatterns": [
+        "*.js",
+        "!next.config.js"
+    ],
+    "rules": {
+        "react/no-unescaped-entities": "off"
+    }
+}

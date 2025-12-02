@@ -27,6 +27,10 @@ type AuthStatus =
   | "fail"
   | "denied";
 
+// Constants
+const REDIRECT_DELAY_MS = 2500;
+const CAMERA_PERMISSION_TIMEOUT_MS = 30000;
+
 export default function AuthPage() {
   const router = useRouter();
   const { refreshLanguage } = useLanguage();
@@ -278,7 +282,7 @@ export default function AuthPage() {
         await refreshLanguage();
       }
       router.push("/en/dashboard");
-    }, 2500);
+    }, REDIRECT_DELAY_MS);
   }
 
   function handleVerificationFail(errorMessage: string) {
