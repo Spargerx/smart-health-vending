@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import {
   ShoppingCart,
   Plus,
@@ -103,6 +104,7 @@ const bundles = [
 ];
 
 export default function QuickBuyPage() {
+  const prefersReducedMotion = useReducedMotion();
 
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
@@ -183,9 +185,9 @@ export default function QuickBuyPage() {
         {/* Header */}
         <motion.header
           className="mb-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: -20 }}
+          animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.4 }}
         >
           <div className="mb-4 flex items-center justify-between">
             <Link
@@ -225,9 +227,9 @@ export default function QuickBuyPage() {
         {/* Recommended Section */}
         <motion.section
           className="mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+          animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.4, delay: 0.1 }}
         >
           <div className="frosted-card rounded-3xl border border-white/10 p-6 sm:p-8">
             <div className="mb-6 flex items-center gap-3">
@@ -245,7 +247,7 @@ export default function QuickBuyPage() {
                 <motion.div
                   key={product.id}
                   className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-cyan-300/50"
-                  whileHover={{ y: -4 }}
+                  whileHover={prefersReducedMotion ? {} : { y: -4 }}
                 >
                   <div className="mb-2 flex items-start justify-between">
                     <div className="flex-1">

@@ -23,6 +23,7 @@ export default function Home() {
     const router = useRouter();
 
     const [isNavigating, setIsNavigating] = useState(false);
+    const [isLanguageSwitching, setIsLanguageSwitching] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
 
@@ -95,7 +96,7 @@ export default function Home() {
 
     return (
         <section
-            className={`relative min-h-screen overflow-hidden bg-gradient-to-b from-[#050b17] via-[#050f1f] to-[#030815] text-white transition-all duration-500 ${isNavigating ? "opacity-0" : "opacity-100"
+            className={`relative min-h-screen overflow-hidden bg-gradient-to-b from-[#050b17] via-[#050f1f] to-[#030815] text-white transition-all duration-500 ${isNavigating || isLanguageSwitching ? "opacity-0" : "opacity-100"
                 }`}
         >
             <div className="orbital-gradient" aria-hidden />
@@ -136,17 +137,21 @@ export default function Home() {
                     </div>
 
                     <motion.button
-                        onClick={() => router.push("/hi")}
-                        className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                            setIsLanguageSwitching(true);
+                            setTimeout(() => router.push("/hi"), 350);
+                        }}
+                        disabled={isLanguageSwitching}
+                        className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        whileHover={!isLanguageSwitching ? { scale: 1.05 } : {}}
+                        whileTap={!isLanguageSwitching ? { scale: 0.95 } : {}}
                     >
                         <Globe className="h-4 w-4" />
                         <span>हिंदी</span>
                     </motion.button>
                 </header>
 
-                <div className={`mt-12 space-y-8 transition-all duration-500 ${isNavigating ? "translate-y-4 opacity-50" : "opacity-100"}`}>
+                <div className={`mt-12 space-y-8 transition-all duration-500 ${isNavigating || isLanguageSwitching ? "translate-y-4 opacity-50" : "opacity-100"}`}>
                     <div className="space-y-6 lg:max-w-4xl">
                         <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
                             {"Welcome to CureGenie - The Smart Health Assistance Vending Machine"}
