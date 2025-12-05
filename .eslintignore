@@ -1,0 +1,4 @@
+# Ignore all utility scripts and helper files
+*.js
+!next.config.js
+!next.config.mjs
