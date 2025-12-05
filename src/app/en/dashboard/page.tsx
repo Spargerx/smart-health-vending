@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import {
   Stethoscope,
   ShoppingCart,
@@ -15,7 +16,6 @@ import {
   AlertCircle,
   Sparkles,
 } from "lucide-react";
-import { getCookie, getProfileCookie, setProfileCookie } from "@/utils/cookieUtils";
 
 const quickBuyItems = [
   { name: "Bandage", icon: Bandage },
@@ -27,6 +27,7 @@ const quickBuyItems = [
 // ... imports ...
 
 export default function DashboardPage() {
+  const prefersReducedMotion = useReducedMotion();
   const [studentName, setStudentName] = useState("Student");
   const [isLoadingName, setIsLoadingName] = useState(true);
   const [nameError, setNameError] = useState("");
@@ -73,22 +74,19 @@ export default function DashboardPage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 1. Try to get full profile from cookie first (fastest)
-    const profile = getProfileCookie();
-    if (profile && profile.firstName) {
-      setStudentName(profile.firstName);
+    const storedName = sessionStorage.getItem("studentFirstName");
+    if (storedName) {
+      setStudentName(storedName);
       setIsLoadingName(false);
       return;
     }
 
-    // 2. Fallback: Check if we have studentId cookie but no profile
-    const storedId = getCookie("studentId");
+    const storedId = sessionStorage.getItem("studentId");
     if (!storedId) {
       setIsLoadingName(false);
       return;
     }
 
-    // 3. Fetch profile if we have ID but no profile data
     const controller = new AbortController();
 
     const fetchStudentName = async () => {
@@ -96,17 +94,10 @@ export default function DashboardPage() {
         setIsLoadingName(true);
         setNameError("");
 
-        const response = await fetch("/api/gateway", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: "get-student-profile",
-            payload: { uid: storedId }
-          }),
-          signal: controller.signal
-        });
+        const response = await fetch(
+          `/api/student-profile?uid=${encodeURIComponent(storedId)}`,
+          { signal: controller.signal }
+        );
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
@@ -116,14 +107,12 @@ export default function DashboardPage() {
         const data = await response.json();
         if (data.firstName) {
           setStudentName(data.firstName);
-          // Store it for next time
-          setProfileCookie(data);
+          sessionStorage.setItem("studentFirstName", data.firstName);
         } else if (data.success === false) {
           setNameError("Student not found");
         }
       } catch (error) {
         if (error instanceof Error && error.name === "AbortError") return;
-        console.error("Failed to fetch student name:", error);
         if (error instanceof Error) {
           setNameError("Unable to fetch student name");
         } else {
@@ -148,9 +137,9 @@ export default function DashboardPage() {
         {/* Header */}
         <motion.header
           className="mb-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: -20 }}
+          animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.5 }}
         >
           <motion.div
             className="mb-6 flex items-center gap-3"
@@ -193,10 +182,10 @@ export default function DashboardPage() {
             <motion.div
               key={section.title}
               className="frosted-card rounded-3xl border border-white/10 p-6 sm:p-8 transition hover:border-cyan-300/50"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-              whileHover={{ y: -4 }}
+              initial={prefersReducedMotion ? {} : { opacity: 0, y: 30 }}
+              animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+              transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: 0.3 + index * 0.1 }}
+              whileHover={prefersReducedMotion ? {} : { y: -4 }}
             >
               <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
                 {/* Icon */}

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { BrowserMultiFormatReader } from "@zxing/library";
 import {
     CheckCircle2,
     XCircle,
@@ -14,7 +15,6 @@ import {
     Upload,
 } from "lucide-react";
 import Link from "next/link";
-import { setCookie, setProfileCookie } from "@/utils/cookieUtils";
 
 type AuthStatus =
     | "idle"
@@ -39,6 +39,7 @@ export default function HindiAuthPage() {
     const videoRef = useRef<HTMLVideoElement>(null);
     const scanFrameRef = useRef<HTMLDivElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
+    const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Function to stop camera and cleanup
@@ -52,10 +53,13 @@ export default function HindiAuthPage() {
         if (videoRef.current) {
             videoRef.current.srcObject = null;
         }
+        codeReaderRef.current?.reset();
     }
 
-    // Cleanup on unmount
     useEffect(() => {
+        codeReaderRef.current = new BrowserMultiFormatReader();
+
+        // Cleanup on unmount
         return () => {
             stopCamera();
         };
@@ -184,16 +188,13 @@ export default function HindiAuthPage() {
 
             const base64Image = capturedImage.split(",")[1];
 
-            const response = await fetch("/api/gateway", {
+            const response = await fetch("/api/read-barcode", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    action: "verify-barcode",
-                    payload: {
-                        image: base64Image,
-                    }
+                    image: base64Image,
                 }),
             });
 
@@ -265,28 +266,9 @@ export default function HindiAuthPage() {
             stopCamera();
 
             if (typeof window !== "undefined") {
-                // Store ID in cookie for quick access
-                setCookie("studentId", barcodeText, 7);
-
-                // Fetch full profile to store in cookie
-                try {
-                    const profileRes = await fetch("/api/gateway", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            action: "get-student-profile",
-                            payload: { uid: barcodeText }
-                        })
-                    });
-
-                    if (profileRes.ok) {
-                        const profileData = await profileRes.json();
-                        if (profileData.success) {
-                            setProfileCookie(profileData);
-                        }
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch/store profile cookie:", e);
+                sessionStorage.setItem("studentId", barcodeText);
+                if (firstName) {
+                    sessionStorage.setItem("studentFirstName", firstName);
                 }
             }
             router.push("/hi/dashboard");

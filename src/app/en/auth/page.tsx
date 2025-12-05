@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { BrowserMultiFormatReader } from "@zxing/library";
 import {
   CheckCircle2,
   XCircle,
@@ -15,7 +16,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
-import { setCookie, setProfileCookie } from "@/utils/cookieUtils";
 
 type AuthStatus =
   | "idle"
@@ -46,6 +46,7 @@ export default function AuthPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const scanFrameRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -60,10 +61,13 @@ export default function AuthPage() {
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    codeReaderRef.current?.reset();
   }
 
-  // Cleanup on unmount
   useEffect(() => {
+    codeReaderRef.current = new BrowserMultiFormatReader();
+
+    // Cleanup on unmount
     return () => {
       stopCamera();
     };
@@ -192,16 +196,13 @@ export default function AuthPage() {
 
       const base64Image = capturedImage.split(",")[1];
 
-      const response = await fetch("/api/gateway", {
+      const response = await fetch("/api/read-barcode", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          action: "verify-barcode",
-          payload: {
-            image: base64Image,
-          }
+          image: base64Image,
         }),
       });
 
@@ -268,36 +269,15 @@ export default function AuthPage() {
     setUserName(firstName || "Student");
 
     // Navigate to dashboard after animation
-    // Navigate to dashboard after animation
     setTimeout(async () => {
       // Ensure camera is stopped before navigation
       stopCamera();
 
       if (typeof window !== "undefined") {
-        // Store ID in cookie for quick access
-        setCookie("studentId", barcodeText, 7);
-
-        // Fetch full profile to store in cookie
-        try {
-          const profileRes = await fetch("/api/gateway", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              action: "get-student-profile",
-              payload: { uid: barcodeText }
-            })
-          });
-
-          if (profileRes.ok) {
-            const profileData = await profileRes.json();
-            if (profileData.success) {
-              setProfileCookie(profileData);
-            }
-          }
-        } catch (e) {
-          console.error("Failed to fetch/store profile cookie:", e);
+        sessionStorage.setItem("studentId", barcodeText);
+        if (firstName) {
+          sessionStorage.setItem("studentFirstName", firstName);
         }
-
         // Refresh language context to pick up user preference
         await refreshLanguage();
       }

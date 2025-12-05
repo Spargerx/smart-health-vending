@@ -17,14 +17,23 @@ import {
     ChevronLeft,
     CheckCircle2,
     Globe,
+    FileText,
+    AlertTriangle,
+    Mail,
+    Send,
 } from "lucide-react";
 
 export default function Home() {
     const router = useRouter();
 
     const [isNavigating, setIsNavigating] = useState(false);
+    const [isLanguageSwitching, setIsLanguageSwitching] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
+    const [showTerms, setShowTerms] = useState(false);
+    const [showSafety, setShowSafety] = useState(false);
+    const [showContact, setShowContact] = useState(false);
+    const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
 
     const essentials = [
         "Medical-grade bandages and sterile cotton",
@@ -95,7 +104,7 @@ export default function Home() {
 
     return (
         <section
-            className={`relative min-h-screen overflow-hidden bg-gradient-to-b from-[#050b17] via-[#050f1f] to-[#030815] text-white transition-all duration-500 ${isNavigating ? "opacity-0" : "opacity-100"
+            className={`relative min-h-screen overflow-hidden bg-gradient-to-b from-[#050b17] via-[#050f1f] to-[#030815] text-white transition-all duration-500 ${isNavigating || isLanguageSwitching ? "opacity-0" : "opacity-100"
                 }`}
         >
             <div className="orbital-gradient" aria-hidden />
@@ -136,17 +145,21 @@ export default function Home() {
                     </div>
 
                     <motion.button
-                        onClick={() => router.push("/hi")}
-                        className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                            setIsLanguageSwitching(true);
+                            setTimeout(() => router.push("/hi"), 350);
+                        }}
+                        disabled={isLanguageSwitching}
+                        className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        whileHover={!isLanguageSwitching ? { scale: 1.05 } : {}}
+                        whileTap={!isLanguageSwitching ? { scale: 0.95 } : {}}
                     >
                         <Globe className="h-4 w-4" />
                         <span>हिंदी</span>
                     </motion.button>
                 </header>
 
-                <div className={`mt-12 space-y-8 transition-all duration-500 ${isNavigating ? "translate-y-4 opacity-50" : "opacity-100"}`}>
+                <div className={`mt-12 space-y-8 transition-all duration-500 ${isNavigating || isLanguageSwitching ? "translate-y-4 opacity-50" : "opacity-100"}`}>
                     <div className="space-y-6 lg:max-w-4xl">
                         <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
                             {"Welcome to CureGenie - The Smart Health Assistance Vending Machine"}
@@ -227,15 +240,15 @@ export default function Home() {
             <footer className="relative z-10 border-t border-white/10 bg-slate-950/70">
                 <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-8">
                     <nav className="flex flex-wrap gap-4">
-                        <a href="#" className="transition hover:text-white">
+                        <button onClick={() => setShowTerms(true)} className="transition hover:text-white">
                             {"Terms & Privacy"}
-                        </a>
-                        <a href="#" className="transition hover:text-white">
+                        </button>
+                        <button onClick={() => setShowSafety(true)} className="transition hover:text-white">
                             {"Safety Info"}
-                        </a>
-                        <a href="#" className="transition hover:text-white">
+                        </button>
+                        <button onClick={() => setShowContact(true)} className="transition hover:text-white">
                             {"Contact Support"}
-                        </a>
+                        </button>
                     </nav>
                     <p className="text-xs text-slate-500">
                         {"Do not use this machine in place of emergency services. For life-threatening situations, call your local emergency number immediately."}
@@ -401,6 +414,333 @@ export default function Home() {
                     </>
                 )}
             </AnimatePresence>
+            {/* Terms & Privacy Modal */}
+            <AnimatePresence>
+                {showTerms && (
+                    <>
+                        <motion.div
+                            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowTerms(false)}
+                        />
+                        <motion.div
+                            className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl max-h-[80vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/20 bg-slate-900 p-6 shadow-2xl sm:p-8"
+                            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="mb-6 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <FileText className="h-8 w-8 text-cyan-400" />
+                                    <h2 className="text-2xl font-semibold text-white">Terms & Privacy Policy</h2>
+                                </div>
+                                <button
+                                    onClick={() => setShowTerms(false)}
+                                    className="rounded-full bg-white/10 p-2 text-slate-400 transition hover:bg-white/20 hover:text-white"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6 text-slate-300">
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">Privacy First</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>We don&apos;t store your photo. It&apos;s analyzed once and deleted immediately.</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>Only masked identity logs are kept for audit safety.</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>No personal medical records are stored.</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>Your student token is secure and encrypted.</span>
+                                        </li>
+                                    </ul>
+                                </section>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">Terms of Use</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>This machine provides basic first-aid guidance only.</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>For emergencies, always call 112 or visit a hospital.</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>AI recommendations are reviewed by medical professionals.</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>You must be a registered student to use this service.</span>
+                                        </li>
+                                    </ul>
+                                </section>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">Data Usage</h3>
+                                    <p className="text-sm">
+                                        We collect minimal data: student ID (masked), timestamp, and purchased items. This data helps us improve service quality and maintain inventory. We never share your data with third parties.
+                                    </p>
+                                </section>
+                            </div>
+
+                            <div className="mt-6 flex justify-end">
+                                <motion.button
+                                    onClick={() => setShowTerms(false)}
+                                    className="rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    Got it
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Safety Info Modal */}
+            <AnimatePresence>
+                {showSafety && (
+                    <>
+                        <motion.div
+                            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowSafety(false)}
+                        />
+                        <motion.div
+                            className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl max-h-[80vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/20 bg-slate-900 p-6 shadow-2xl sm:p-8"
+                            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="mb-6 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <AlertTriangle className="h-8 w-8 text-amber-400" />
+                                    <h2 className="text-2xl font-semibold text-white">Safety Information</h2>
+                                </div>
+                                <button
+                                    onClick={() => setShowSafety(false)}
+                                    className="rounded-full bg-white/10 p-2 text-slate-400 transition hover:bg-white/20 hover:text-white"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6 text-slate-300">
+                                <div className="rounded-xl border-2 border-red-500/30 bg-red-500/10 p-4">
+                                    <h3 className="mb-2 font-semibold text-red-300">⚠️ Emergency Situations</h3>
+                                    <p className="text-sm text-red-200">
+                                        If you experience severe bleeding, difficulty breathing, chest pain, loss of consciousness, or any life-threatening condition, <strong>call 112 immediately</strong> or go to the nearest hospital. Do not rely on this machine for emergencies.
+                                    </p>
+                                </div>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">When to Use This Machine</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-green-400">✓</span>
+                                            <span>Minor cuts and scrapes</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-green-400">✓</span>
+                                            <span>Small burns (first-degree)</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-green-400">✓</span>
+                                            <span>Headaches and mild pain</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-green-400">✓</span>
+                                            <span>Basic first-aid supplies</span>
+                                        </li>
+                                    </ul>
+                                </section>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">When NOT to Use</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-red-400">✗</span>
+                                            <span>Severe bleeding or deep wounds</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-red-400">✗</span>
+                                            <span>Broken bones or fractures</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-red-400">✗</span>
+                                            <span>Chest pain or breathing difficulties</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-red-400">✗</span>
+                                            <span>Allergic reactions (severe)</span>
+                                        </li>
+                                    </ul>
+                                </section>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">Important Reminders</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>Always read product labels before use</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>Check expiry dates on all items</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>Follow dosage instructions carefully</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>Consult a doctor if symptoms persist</span>
+                                        </li>
+                                    </ul>
+                                </section>
+                            </div>
+
+                            <div className="mt-6 flex justify-end">
+                                <motion.button
+                                    onClick={() => setShowSafety(false)}
+                                    className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 font-semibold text-white shadow-lg"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    Understood
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Contact Support Modal */}
+            <AnimatePresence>
+                {showContact && (
+                    <>
+                        <motion.div
+                            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowContact(false)}
+                        />
+                        <motion.div
+                            className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl max-h-[80vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/20 bg-slate-900 p-6 shadow-2xl sm:p-8"
+                            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="mb-6 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <Mail className="h-8 w-8 text-emerald-400" />
+                                    <h2 className="text-2xl font-semibold text-white">Contact Support</h2>
+                                </div>
+                                <button
+                                    onClick={() => setShowContact(false)}
+                                    className="rounded-full bg-white/10 p-2 text-slate-400 transition hover:bg-white/20 hover:text-white"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+                                    <h3 className="mb-4 text-lg font-semibold text-white">Get in Touch</h3>
+                                    <div className="space-y-3 text-sm text-slate-300">
+                                        <div className="flex items-center gap-3">
+                                            <Mail className="h-5 w-5 text-cyan-400" />
+                                            <a href="mailto:support@curegenie.com" className="hover:text-cyan-300 transition">
+                                                support@curegenie.com
+                                            </a>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Globe className="h-5 w-5 text-cyan-400" />
+                                            <a href="https://curegenie.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-300 transition">
+                                                www.curegenie.com
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+                                    <h3 className="mb-4 text-lg font-semibold text-white">Send Feedback</h3>
+                                    <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert("Thank you for your feedback! We'll get back to you soon."); setShowContact(false); }}>
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium text-slate-300">Name</label>
+                                            <input
+                                                type="text"
+                                                value={contactForm.name}
+                                                onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                                                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                                                placeholder="Your name"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium text-slate-300">Email</label>
+                                            <input
+                                                type="email"
+                                                value={contactForm.email}
+                                                onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                                                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                                                placeholder="your.email@example.com"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium text-slate-300">Message</label>
+                                            <textarea
+                                                value={contactForm.message}
+                                                onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                                                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                                                placeholder="How can we help you?"
+                                                rows={4}
+                                                required
+                                            />
+                                        </div>
+                                        <motion.button
+                                            type="submit"
+                                            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-6 py-3 font-semibold text-white shadow-lg"
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                        >
+                                            <Send className="h-4 w-4" />
+                                            Send Message
+                                        </motion.button>
+                                    </form>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+
         </section>
     );
 }

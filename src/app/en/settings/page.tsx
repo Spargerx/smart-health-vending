@@ -22,6 +22,10 @@ import {
   Mail,
   MessageSquare,
   AlertTriangle,
+  Edit,
+  Save,
+  X as XIcon,
+  CheckCircle,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -34,6 +38,10 @@ export default function SettingsPage() {
   const [emailReceipts, setEmailReceipts] = useState(true);
   const [monthlySummary, setMonthlySummary] = useState(false);
   const [emergencyAlerts, setEmergencyAlerts] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<{ age: string; allergy: string; number: string }>({ age: "", allergy: "", number: "" });
+  const [isSaving, setIsSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const uid = sessionStorage.getItem("studentId");
@@ -54,6 +62,72 @@ export default function SettingsPage() {
         .catch((err) => console.error("Failed to fetch profile", err));
     }
   }, []);
+
+  function handleEdit() {
+    if (profile) {
+      setEditedProfile({
+        age: profile.age?.toString() || "",
+        allergy: profile.allergy || "",
+        number: profile.number || "",
+      });
+      setIsEditing(true);
+      setSuccessMessage("");
+    }
+  }
+
+  function handleCancel() {
+    setIsEditing(false);
+    setEditedProfile({ age: "", allergy: "", number: "" });
+    setSuccessMessage("");
+  }
+
+  async function handleSave() {
+    if (!profile) return;
+
+    // Validate age
+    if (editedProfile.age && (isNaN(Number(editedProfile.age)) || Number(editedProfile.age) < 1)) {
+      alert("Please enter a valid age");
+      return;
+    }
+
+    setIsSaving(true);
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch("/api/update-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: profile.uid,
+          age: editedProfile.age ? Number(editedProfile.age) : null,
+          allergy: editedProfile.allergy || null,
+          number: editedProfile.number || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Update local profile state
+        setProfile({
+          ...profile,
+          age: editedProfile.age ? Number(editedProfile.age) : null,
+          allergy: editedProfile.allergy || null,
+          number: editedProfile.number || null,
+        });
+        setIsEditing(false);
+        setSuccessMessage("Profile updated successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000);
+      } else {
+        alert(data.message || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating your profile");
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   function handleLogout() {
     if (confirm("Are you sure you want to log out?")) {
@@ -122,7 +196,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 text-sm text-slate-400">{"Registered Number"}</div>
+                <div className="mb-2 text-sm text-slate-400">{"Phone Number"}</div>
                 <div className="text-lg font-semibold text-white">
                   {profile?.number ? profile.number : profile ? "Not Registered" : "Loading..."}
                 </div>

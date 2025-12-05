@@ -17,13 +17,22 @@ import {
     ChevronLeft,
     CheckCircle2,
     Globe,
+    FileText,
+    AlertTriangle,
+    Mail,
+    Send,
 } from "lucide-react";
 
 export default function HindiHome() {
     const router = useRouter();
     const [isNavigating, setIsNavigating] = useState(false);
+    const [isLanguageSwitching, setIsLanguageSwitching] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
+    const [showTerms, setShowTerms] = useState(false);
+    const [showSafety, setShowSafety] = useState(false);
+    const [showContact, setShowContact] = useState(false);
+    const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" });
 
     const essentials = [
         "बैंडेज और ड्रेसिंग",
@@ -93,12 +102,13 @@ export default function HindiHome() {
     }
 
     const toggleLanguage = () => {
-        router.push("/en");
+        setIsLanguageSwitching(true);
+        setTimeout(() => router.push("/en"), 350);
     };
 
     return (
         <section
-            className={`relative min-h-screen overflow-hidden bg-gradient-to-b from-[#050b17] via-[#050f1f] to-[#030815] text-white transition-all duration-500 ${isNavigating ? "opacity-0" : "opacity-100"
+            className={`relative min-h-screen overflow-hidden bg-gradient-to-b from-[#050b17] via-[#050f1f] to-[#030815] text-white transition-all duration-500 ${isNavigating || isLanguageSwitching ? "opacity-0" : "opacity-100"
                 }`}
         >
             <div className="orbital-gradient" aria-hidden />
@@ -140,16 +150,17 @@ export default function HindiHome() {
 
                     <motion.button
                         onClick={toggleLanguage}
-                        className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        disabled={isLanguageSwitching}
+                        className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        whileHover={!isLanguageSwitching ? { scale: 1.05 } : {}}
+                        whileTap={!isLanguageSwitching ? { scale: 0.95 } : {}}
                     >
                         <Globe className="h-4 w-4" />
                         <span>English</span>
                     </motion.button>
                 </header>
 
-                <div className={`mt-12 space-y-8 transition-all duration-500 ${isNavigating ? "translate-y-4 opacity-50" : "opacity-100"}`}>
+                <div className={`mt-12 space-y-8 transition-all duration-500 ${isNavigating || isLanguageSwitching ? "translate-y-4 opacity-50" : "opacity-100"}`}>
                     <div className="space-y-6 lg:max-w-4xl">
                         <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
                             आपका स्मार्ट<br />
@@ -233,15 +244,15 @@ export default function HindiHome() {
             <footer className="relative z-10 border-t border-white/10 bg-slate-950/70">
                 <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-8">
                     <nav className="flex flex-wrap gap-4">
-                        <a href="#" className="transition hover:text-white">
+                        <button onClick={() => setShowTerms(true)} className="transition hover:text-white">
                             नियम और शर्तें
-                        </a>
-                        <a href="#" className="transition hover:text-white">
+                        </button>
+                        <button onClick={() => setShowSafety(true)} className="transition hover:text-white">
                             सुरक्षा जानकारी
-                        </a>
-                        <a href="#" className="transition hover:text-white">
+                        </button>
+                        <button onClick={() => setShowContact(true)} className="transition hover:text-white">
                             संपर्क करें
-                        </a>
+                        </button>
                     </nav>
                     <p className="text-xs text-slate-500">
                         © 2024 क्योरजीनी. सर्वाधिकार सुरक्षित।
@@ -407,6 +418,333 @@ export default function HindiHome() {
                     </>
                 )}
             </AnimatePresence>
+            {/* Terms & Privacy Modal - Hindi */}
+            <AnimatePresence>
+                {showTerms && (
+                    <>
+                        <motion.div
+                            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowTerms(false)}
+                        />
+                        <motion.div
+                            className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl max-h-[80vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/20 bg-slate-900 p-6 shadow-2xl sm:p-8"
+                            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="mb-6 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <FileText className="h-8 w-8 text-cyan-400" />
+                                    <h2 className="text-2xl font-semibold text-white">नियम और गोपनीयता नीति</h2>
+                                </div>
+                                <button
+                                    onClick={() => setShowTerms(false)}
+                                    className="rounded-full bg-white/10 p-2 text-slate-400 transition hover:bg-white/20 hover:text-white"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6 text-slate-300">
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">गोपनीयता पहले</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>हम आपकी फोटो स्टोर नहीं करते। इसका विश्लेषण एक बार किया जाता है और तुरंत हटा दिया जाता है।</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>ऑडिट सुरक्षा के लिए केवल मास्क्ड आइडेंटिटी लॉग रखे जाते हैं।</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>कोई व्यक्तिगत चिकित्सा रिकॉर्ड संग्रहीत नहीं किया जाता है।</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>आपका स्टूडेंट टोकन सुरक्षित और एन्क्रिप्टेड है।</span>
+                                        </li>
+                                    </ul>
+                                </section>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">उपयोग की शर्तें</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>यह मशीन केवल बुनियादी प्राथमिक चिकित्सा मार्गदर्शन प्रदान करती है।</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>आपात स्थिति के लिए, हमेशा 112 पर कॉल करें या अस्पताल जाएं।</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>AI सिफारिशों की चिकित्सा पेशेवरों द्वारा समीक्षा की जाती है।</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>इस सेवा का उपयोग करने के लिए आपको पंजीकृत छात्र होना चाहिए।</span>
+                                        </li>
+                                    </ul>
+                                </section>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">डेटा उपयोग</h3>
+                                    <p className="text-sm">
+                                        हम न्यूनतम डेटा एकत्र करते हैं: स्टूडेंट आईडी (मास्क्ड), टाइमस्टैम्प, और खरीदी गई वस्तुएं। यह डेटा हमें सेवा की गुणवत्ता में सुधार करने और इन्वेंट्री बनाए रखने में मदद करता है। हम कभी भी आपका डेटा तीसरे पक्ष के साथ साझा नहीं करते हैं।
+                                    </p>
+                                </section>
+                            </div>
+
+                            <div className="mt-6 flex justify-end">
+                                <motion.button
+                                    onClick={() => setShowTerms(false)}
+                                    className="rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    समझ गया
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Safety Info Modal - Hindi */}
+            <AnimatePresence>
+                {showSafety && (
+                    <>
+                        <motion.div
+                            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowSafety(false)}
+                        />
+                        <motion.div
+                            className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl max-h-[80vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/20 bg-slate-900 p-6 shadow-2xl sm:p-8"
+                            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="mb-6 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <AlertTriangle className="h-8 w-8 text-amber-400" />
+                                    <h2 className="text-2xl font-semibold text-white">सुरक्षा जानकारी</h2>
+                                </div>
+                                <button
+                                    onClick={() => setShowSafety(false)}
+                                    className="rounded-full bg-white/10 p-2 text-slate-400 transition hover:bg-white/20 hover:text-white"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6 text-slate-300">
+                                <div className="rounded-xl border-2 border-red-500/30 bg-red-500/10 p-4">
+                                    <h3 className="mb-2 font-semibold text-red-300">⚠️ आपातकालीन स्थितियां</h3>
+                                    <p className="text-sm text-red-200">
+                                        यदि आप गंभीर रक्तस्राव, सांस लेने में कठिनाई, सीने में दर्द, चेतना की हानि, या किसी भी जीवन-धमकी की स्थिति का अनुभव करते हैं, तो <strong>तुरंत 112 पर कॉल करें</strong> या निकटतम अस्पताल जाएं। आपात स्थिति के लिए इस मशीन पर निर्भर न रहें।
+                                    </p>
+                                </div>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">इस मशीन का उपयोग कब करें</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-green-400">✓</span>
+                                            <span>छोटे कट और खरोंच</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-green-400">✓</span>
+                                            <span>छोटी जलन (प्रथम-डिग्री)</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-green-400">✓</span>
+                                            <span>सिरदर्द और हल्का दर्द</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-green-400">✓</span>
+                                            <span>बुनियादी प्राथमिक चिकित्सा आपूर्ति</span>
+                                        </li>
+                                    </ul>
+                                </section>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">कब उपयोग न करें</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-red-400">✗</span>
+                                            <span>गंभीर रक्तस्राव या गहरे घाव</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-red-400">✗</span>
+                                            <span>टूटी हड्डियां या फ्रैक्चर</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-red-400">✗</span>
+                                            <span>सीने में दर्द या सांस लेने में कठिनाई</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-red-400">✗</span>
+                                            <span>एलर्जी प्रतिक्रियाएं (गंभीर)</span>
+                                        </li>
+                                    </ul>
+                                </section>
+
+                                <section>
+                                    <h3 className="mb-3 text-lg font-semibold text-white">महत्वपूर्ण अनुस्मारक</h3>
+                                    <ul className="space-y-2 text-sm">
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>उपयोग से पहले हमेशा उत्पाद लेबल पढ़ें</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>सभी वस्तुओं पर समाप्ति तिथियां जांचें</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>खुराक निर्देशों का सावधानीपूर्वक पालन करें</span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="text-cyan-400">•</span>
+                                            <span>यदि लक्षण बने रहते हैं तो डॉक्टर से परामर्श लें</span>
+                                        </li>
+                                    </ul>
+                                </section>
+                            </div>
+
+                            <div className="mt-6 flex justify-end">
+                                <motion.button
+                                    onClick={() => setShowSafety(false)}
+                                    className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 font-semibold text-white shadow-lg"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    समझ गया
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Contact Support Modal - Hindi */}
+            <AnimatePresence>
+                {showContact && (
+                    <>
+                        <motion.div
+                            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowContact(false)}
+                        />
+                        <motion.div
+                            className="fixed left-1/2 top-1/2 z-50 w-full max-w-2xl max-h-[80vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/20 bg-slate-900 p-6 shadow-2xl sm:p-8"
+                            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="mb-6 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <Mail className="h-8 w-8 text-emerald-400" />
+                                    <h2 className="text-2xl font-semibold text-white">सहायता से संपर्क करें</h2>
+                                </div>
+                                <button
+                                    onClick={() => setShowContact(false)}
+                                    className="rounded-full bg-white/10 p-2 text-slate-400 transition hover:bg-white/20 hover:text-white"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+                                    <h3 className="mb-4 text-lg font-semibold text-white">संपर्क में रहें</h3>
+                                    <div className="space-y-3 text-sm text-slate-300">
+                                        <div className="flex items-center gap-3">
+                                            <Mail className="h-5 w-5 text-cyan-400" />
+                                            <a href="mailto:support@curegenie.com" className="hover:text-cyan-300 transition">
+                                                support@curegenie.com
+                                            </a>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Globe className="h-5 w-5 text-cyan-400" />
+                                            <a href="https://curegenie.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-300 transition">
+                                                www.curegenie.com
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-6">
+                                    <h3 className="mb-4 text-lg font-semibold text-white">फीडबैक भेजें</h3>
+                                    <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); alert("आपकी प्रतिक्रिया के लिए धन्यवाद! हम जल्द ही आपसे संपर्क करेंगे।"); setShowContact(false); }}>
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium text-slate-300">नाम</label>
+                                            <input
+                                                type="text"
+                                                value={contactForm.name}
+                                                onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                                                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                                                placeholder="आपका नाम"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium text-slate-300">ईमेल</label>
+                                            <input
+                                                type="email"
+                                                value={contactForm.email}
+                                                onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                                                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                                                placeholder="your.email@example.com"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium text-slate-300">संदेश</label>
+                                            <textarea
+                                                value={contactForm.message}
+                                                onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                                                className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
+                                                placeholder="हम आपकी कैसे मदद कर सकते हैं?"
+                                                rows={4}
+                                                required
+                                            />
+                                        </div>
+                                        <motion.button
+                                            type="submit"
+                                            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-500 px-6 py-3 font-semibold text-white shadow-lg"
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                        >
+                                            <Send className="h-4 w-4" />
+                                            संदेश भेजें
+                                        </motion.button>
+                                    </form>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+
         </section>
     );
 }

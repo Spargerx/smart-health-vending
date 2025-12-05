@@ -172,7 +172,7 @@ export default function HealthAnalysisPage() {
     setImagePreview(null);
   }
 
-  async function handleAnalyze() {
+  function handleAnalyze() {
     const missingImage = !image;
     const missingDescription = description.length < 10;
 
@@ -186,51 +186,11 @@ export default function HealthAnalysisPage() {
     }
 
     setIsAnalyzing(true);
-
-    try {
-      const response = await fetch("/api/gateway", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          action: "analyze-health",
-          payload: {
-            image: image,
-            description: description
-          }
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Analysis failed");
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Update suggestions with real data from backend
-        setSuggestions({
-          category: data.category || "Other",
-          confidence: data.confidence || 0,
-          severity: data.severity || "Moderate",
-          needsDoctor: data.needs_doctor || false,
-          suggestedItems: data.suggested_items || []
-        });
-        setShowUrgentAlert(data.needs_doctor || data.severity === "High");
-      } else {
-        console.error("Analysis failed:", data.message);
-        // Fallback to local simulation if backend fails? Or show error?
-        // For now, let's keep the local simulation as fallback if backend fails
-        analyzeInput();
-      }
-    } catch (error) {
-      console.error("Error analyzing health:", error);
-      // Fallback to local simulation
-      analyzeInput();
-    } finally {
+    // Simulate analysis
+    setTimeout(() => {
       setIsAnalyzing(false);
-    }
+      // Navigate to results page or show results
+    }, 3000);
   }
 
   function insertExample(exampleKey: string) {

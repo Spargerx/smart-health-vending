@@ -25,10 +25,9 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="hi" suppressHydrationWarning>
+        <html lang="hi">
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-                suppressHydrationWarning
             >
                 <LanguageProvider forcedLanguage="Hindi">
                     {children}
