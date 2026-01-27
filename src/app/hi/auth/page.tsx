@@ -14,6 +14,7 @@ import {
     Upload,
 } from "lucide-react";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 import { setUserCookie } from "@/utils/cookies";
 
 type AuthStatus =
@@ -28,6 +29,7 @@ type AuthStatus =
 
 export default function HindiAuthPage() {
     const router = useRouter();
+    const { refreshLanguage } = useLanguage();
     const [status, setStatus] = useState<AuthStatus>("idle");
     const [message, setMessage] = useState("");
     const [userName, setUserName] = useState("छात्र");
@@ -235,6 +237,8 @@ export default function HindiAuthPage() {
                         number: (profileData.number as string) || ""
                     });
                 }
+                // Refresh language context to pick up user preference
+                await refreshLanguage();
             }
             router.push("/hi/dashboard");
         }, 2500);
@@ -258,14 +262,14 @@ export default function HindiAuthPage() {
     }
 
     function handleDevBypass() {
-        setShowVerifiedAnimation(true);
-        setStatus("success");
-        setMessage("सत्यापन सफल!");
-        setUserName("Developer");
-
-        setTimeout(() => {
-            router.push("/hi/dashboard");
-        }, 2500);
+        handleVerificationSuccess("DEMO-JURY-BYPASS", "जूरी सदस्य", {
+            uid: "DEMO-JURY-BYPASS",
+            fullName: "जूरी सदस्य",
+            name: "जूरी सदस्य",
+            age: 0,
+            allergy: "कोई नहीं",
+            number: "0000000000"
+        });
     }
 
     function handleDevUpload() {
@@ -318,15 +322,34 @@ export default function HindiAuthPage() {
 
 
 
-            {/* Hidden Dev Bypass Button - Bottom right corner (hover to see) */}
-            <button
-                onClick={handleDevBypass}
-                className="fixed bottom-4 right-4 z-50 h-10 w-10 rounded-full bg-red-500/20 border border-red-500/40 opacity-20 transition-all hover:opacity-100 hover:scale-110 hover:bg-red-500/40"
-                aria-label="Developer bypass"
-                title="Dev Bypass - Click to skip authentication"
-            >
-                <span className="text-xs text-red-400 font-bold">DEV</span>
-            </button>
+            {/* Demo Bypass Button - Visible for Jury Presentation */}
+            <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+                <motion.div
+                    className="rounded-lg bg-amber-500/20 border border-amber-500/40 px-3 py-1.5 backdrop-blur-sm"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1, duration: 0.5 }}
+                >
+                    <p className="text-xs text-amber-200 font-medium">
+                        👇 जूरी के लिए: प्रमाणीकरण छोड़ें
+                    </p>
+                </motion.div>
+                <motion.button
+                    onClick={handleDevBypass}
+                    className="group relative overflow-hidden rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3 shadow-lg shadow-amber-500/50 transition-all hover:shadow-xl hover:shadow-amber-500/60 hover:scale-105"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1.2, duration: 0.5 }}
+                >
+                    <span className="relative z-10 flex items-center gap-2 text-sm font-bold text-white">
+                        <Shield className="h-4 w-4" />
+                        डेमो बायपास
+                    </span>
+                    <span className="absolute inset-0 bg-white/20 opacity-0 transition group-hover:opacity-100" />
+                </motion.button>
+            </div>
 
             {/* Verification Animation Overlay */}
             <AnimatePresence>
@@ -451,6 +474,25 @@ export default function HindiAuthPage() {
             </AnimatePresence>
 
             <div className="relative z-10 mx-auto flex min-h-screen max-w-4xl flex-col px-4 py-8 sm:px-6 lg:px-8">
+                {/* Jury Information Banner */}
+                <motion.div
+                    className="mb-6 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/20 to-orange-500/20 p-4 backdrop-blur-sm"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/30">
+                            <AlertCircle className="h-5 w-5 text-amber-300" />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="mb-1 font-semibold text-amber-200">प्रोटोटाइप डेमो मोड</h3>
+                            <p className="text-sm text-amber-100/90">
+                                <strong>जूरी सदस्यों के लिए:</strong> आप प्रमाणीकरण प्रक्रिया को छोड़ने के लिए <strong>&quot;डेमो बायपास&quot;</strong> बटन (निचले-दाएं कोने) का उपयोग कर सकते हैं।
+                            </p>
+                        </div>
+                    </div>
+                </motion.div>
                 {/* Header */}
                 <motion.header
                     className="mb-8 flex items-center gap-4"

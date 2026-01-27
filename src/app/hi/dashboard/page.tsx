@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import {
     Stethoscope,
     ShoppingCart,
@@ -24,6 +25,7 @@ const quickBuyItems = [
 ];
 
 export default function HindiDashboardPage() {
+    const prefersReducedMotion = useReducedMotion();
     const [studentName, setStudentName] = useState("छात्र");
     const [isLoadingName, setIsLoadingName] = useState(true);
     const [nameError, setNameError] = useState("");
@@ -99,9 +101,9 @@ export default function HindiDashboardPage() {
                 {/* Header */}
                 <motion.header
                     className="mb-8"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
+                    initial={prefersReducedMotion ? {} : { opacity: 0, y: -20 }}
+                    animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                    transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.5 }}
                 >
                     <motion.div
                         className="mb-6 flex items-center gap-3"
@@ -144,10 +146,10 @@ export default function HindiDashboardPage() {
                         <motion.div
                             key={section.title}
                             className="frosted-card rounded-3xl border border-white/10 p-6 sm:p-8 transition hover:border-cyan-300/50"
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                            whileHover={{ y: -4 }}
+                            initial={prefersReducedMotion ? {} : { opacity: 0, y: 30 }}
+                            animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+                            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.5, delay: 0.3 + index * 0.1 }}
+                            whileHover={prefersReducedMotion ? {} : { y: -4 }}
                         >
                             <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
                                 {/* Icon */}

@@ -142,7 +142,7 @@ export default function HindiHome() {
                 }}
             >
                 <header className="flex items-center justify-between gap-4">
-                    <div id="js-active" className="fixed top-0 left-0 z-[100] bg-red-500 text-white p-2">JS Active</div>
+
                     <div className="flex items-center gap-4">
                         <Image
                             src="/curegenie-logo.png"
