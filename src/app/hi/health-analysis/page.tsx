@@ -209,38 +209,31 @@ export default function HindiHealthAnalysisPage() {
         setShowUrgentAlert(false);
 
         try {
-            const response = await fetch("/api/proxy/api/analyze", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    image: image,
-                    description: description,
-                    uid: userUid || "",
-                    language: "hindi",
-                }),
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 2500));
+
+            // Mock Result
+            const result = {
+                diagnosis: "**नकली निदान**: विवरण/फोटो के आधार पर, यह एक छोटी चोट प्रतीत होती है।",
+                medication: "**उपचार के चरण:**\n1. एंटीसेप्टिक वाइप्स से क्षेत्र को साफ करें।\n2. एंटीबायोटिक मलहम लगाएं।\n3. एक बाँझ पट्टी के साथ कवर करें।",
+                prevention: "क्षेत्र को साफ और सूखा रखें। संक्रमण के संकेतों जैसे बढ़ी हुई लालिमा या सूजन के लिए देखें।",
+                vendingitems: "पट्टियाँ, एंटीसेप्टिक वाइप्स",
+                raw: "Raw mock data"
+            };
+
+            setSuggestions({
+                diagnosis: result.diagnosis,
+                medication: result.medication,
+                prevention: result.prevention,
+                vendingitems: result.vendingitems || "",
+                raw: result.raw
             });
 
-            const data = await response.json();
+            // Simple urgency check based on keywords in diagnosis (checking both English and Hindi keywords just in case)
+            const urgentKeywords = ["severe", "emergency", "doctor", "hospital", "immediate attention", "गंभीर", "डॉक्टर", "अस्पताल", "तुरंत"];
+            const isUrgent = urgentKeywords.some(k => result.diagnosis?.toLowerCase().includes(k) || result.medication?.toLowerCase().includes(k));
+            setShowUrgentAlert(isUrgent);
 
-            if (data.success && data.data) {
-                const result = data.data;
-                setSuggestions({
-                    diagnosis: result.diagnosis,
-                    medication: result.medication,
-                    prevention: result.prevention,
-                    vendingitems: result.vendingitems || "",
-                    raw: result.raw
-                });
-
-                // Simple urgency check based on keywords in diagnosis (checking both English and Hindi keywords just in case)
-                const urgentKeywords = ["severe", "emergency", "doctor", "hospital", "immediate attention", "गंभीर", "डॉक्टर", "अस्पताल", "तुरंत"];
-                const isUrgent = urgentKeywords.some(k => result.diagnosis?.toLowerCase().includes(k) || result.medication?.toLowerCase().includes(k));
-                setShowUrgentAlert(isUrgent);
-            } else {
-                alert("विश्लेषण विफल रहा। कृपया पुनः प्रयास करें।");
-            }
         } catch (error) {
             console.error("Analysis error:", error);
             alert("एक त्रुटि हुई। कृपया पुनः प्रयास करें।");

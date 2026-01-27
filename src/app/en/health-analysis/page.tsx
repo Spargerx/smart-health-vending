@@ -221,52 +221,36 @@ export default function HealthAnalysisPage() {
     setShowUrgentAlert(false);
 
     try {
-      // Get fresh UID from sessionStorage or cookies
-      let currentUid = sessionStorage.getItem("studentId");
-      if (!currentUid) {
-        const userProfile = getUserCookie();
-        if (userProfile?.uid) {
-          currentUid = userProfile.uid;
-        }
-      }
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 2500));
 
-      const response = await fetch("/api/proxy/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          image: image,
-          description: description,
-          uid: currentUid || "",
-          language: "english",
-        }),
+      // Mock Result
+      const result = {
+        diagnosis: "**Mock Diagnosis**: Based on the description/image, this appears to be a minor abrasion.",
+        medication: "**Treatment Steps:**\n1. Clean the area with antiseptic wipes.\n2. Apply antibiotic ointment.\n3. Cover with a sterile bandage.",
+        prevention: "Keep the area clean and dry. Watch for signs of infection like increased redness or swelling.",
+        vendingitems: "Bandages, Antiseptic Wipes",
+        raw: "Raw mock data"
+      };
+
+      const timestamp = new Date().toLocaleString('en-US', {
+        dateStyle: 'full',
+        timeStyle: 'short'
+      });
+      setAnalysisTimestamp(timestamp);
+      setSuggestions({
+        diagnosis: result.diagnosis,
+        medication: result.medication,
+        prevention: result.prevention,
+        vendingitems: result.vendingitems || "",
+        raw: result.raw
       });
 
-      const data = await response.json();
+      // Simple urgency check based on keywords in diagnosis
+      const urgentKeywords = ["severe", "emergency", "doctor", "hospital", "immediate attention"];
+      const isUrgent = urgentKeywords.some(k => result.diagnosis?.toLowerCase().includes(k) || result.medication?.toLowerCase().includes(k));
+      setShowUrgentAlert(isUrgent);
 
-      if (data.success && data.data) {
-        const result = data.data;
-        const timestamp = new Date().toLocaleString('en-US', {
-          dateStyle: 'full',
-          timeStyle: 'short'
-        });
-        setAnalysisTimestamp(timestamp);
-        setSuggestions({
-          diagnosis: result.diagnosis,
-          medication: result.medication,
-          prevention: result.prevention,
-          vendingitems: result.vendingitems || "",
-          raw: result.raw
-        });
-
-        // Simple urgency check based on keywords in diagnosis
-        const urgentKeywords = ["severe", "emergency", "doctor", "hospital", "immediate attention"];
-        const isUrgent = urgentKeywords.some(k => result.diagnosis?.toLowerCase().includes(k) || result.medication?.toLowerCase().includes(k));
-        setShowUrgentAlert(isUrgent);
-      } else {
-        alert("Analysis failed. Please try again.");
-      }
     } catch (error) {
       console.error("Analysis error:", error);
       alert("An error occurred. Please try again.");

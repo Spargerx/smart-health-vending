@@ -32,40 +32,11 @@ export function LanguageProvider({
         if (storedLang) {
             setLanguageState(storedLang);
         }
-
-        // Fetch from DB if user is logged in
-        const uid = sessionStorage.getItem("studentId");
-        if (uid) {
-            try {
-                const res = await fetch(`/api/proxy/api/student-profile/${encodeURIComponent(uid)}`);
-                const data = await res.json();
-                if (data.success && data.language) {
-                    setLanguageState(data.language as Language);
-                    sessionStorage.setItem("appLanguage", data.language);
-                }
-            } catch (err) {
-                console.error("Failed to fetch language preference", err);
-            }
-        }
     }, [forcedLanguage]);
 
     const setLanguage = useCallback(async (newLang: Language) => {
         setLanguageState(newLang);
         sessionStorage.setItem("appLanguage", newLang);
-
-        // Update in backend if user is logged in
-        const uid = sessionStorage.getItem("studentId");
-        if (uid) {
-            try {
-                await fetch("/api/proxy/api/update-language", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ uid, language: newLang }),
-                });
-            } catch (err) {
-                console.error("Failed to update language preference", err);
-            }
-        }
     }, []);
 
     useEffect(() => {

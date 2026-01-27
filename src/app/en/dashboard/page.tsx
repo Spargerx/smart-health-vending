@@ -77,55 +77,21 @@ export default function DashboardPage() {
     const storedName = sessionStorage.getItem("studentFirstName");
     if (storedName) {
       setStudentName(storedName);
-      setIsLoadingName(false);
-      return;
-    }
-
-    const storedId = sessionStorage.getItem("studentId");
-    if (!storedId) {
-      setIsLoadingName(false);
-      return;
-    }
-
-    const controller = new AbortController();
-
-    const fetchStudentName = async () => {
-      try {
-        setIsLoadingName(true);
-        setNameError("");
-
-        const response = await fetch(
-          `/api/proxy/api/student-profile/${encodeURIComponent(storedId)}`,
-          { signal: controller.signal }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || "Unable to fetch student name");
+    } else {
+      // Fallback for demo if not set
+      const fullProfile = sessionStorage.getItem("studentProfile");
+      if (fullProfile) {
+        try {
+          const parsed = JSON.parse(fullProfile);
+          setStudentName(parsed.name || "Student");
+        } catch (e) {
+          setStudentName("Student");
         }
-
-        const data = await response.json();
-        if (data.firstName) {
-          setStudentName(data.firstName);
-          sessionStorage.setItem("studentFirstName", data.firstName);
-        } else if (data.success === false) {
-          setNameError("Student not found");
-        }
-      } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") return;
-        if (error instanceof Error) {
-          setNameError("Unable to fetch student name");
-        } else {
-          setNameError("Unable to fetch student name");
-        }
-      } finally {
-        setIsLoadingName(false);
+      } else {
+        setStudentName("Student");
       }
-    };
-
-    fetchStudentName();
-
-    return () => controller.abort();
+    }
+    setIsLoadingName(false);
   }, []);
 
   return (

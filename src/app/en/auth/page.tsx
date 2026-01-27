@@ -183,73 +183,29 @@ export default function AuthPage() {
     setVerificationFailed(false);
 
     try {
-      // Send to API route
-      if (!capturedImage) {
-        setMessage("No image data available.");
-        return;
-      }
+      // Simulate network delay for demo
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      const base64Image = capturedImage.split(",")[1];
+      // Mock Success Response
+      const mockBarcode = "STU12345678";
+      const mockName = "Demo Student";
 
-      const response = await fetch("/api/proxy/api/read-barcode", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          image: base64Image,
-        }),
-      });
+      const mockProfile = {
+        success: true,
+        barcode: mockBarcode,
+        name: mockName,
+        uid: mockBarcode,
+        fullName: "Demo Student User",
+        age: 20,
+        allergy: "None",
+        number: "555-0123"
+      };
 
-      if (!response.ok) {
-        let errorData: { message?: string; error?: string; details?: unknown } = {};
-        try {
-          errorData = await response.json();
-        } catch (e) {
-          console.error("Failed to parse error response:", e);
-          errorData = {
-            message: `Server error (${response.status})`,
-            error: response.statusText || "Unknown error"
-          };
-        }
+      handleVerificationSuccess(mockBarcode, mockName, mockProfile);
 
-        console.error("Barcode API error:", {
-          status: response.status,
-          error: errorData.error,
-          message: errorData.message,
-          details: errorData.details
-        });
-
-        // Show user-friendly error message
-        const userMessage = errorData.message || errorData.error || "Failed to verify. Please try again.";
-        handleVerificationFail(userMessage);
-        return;
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.barcode) {
-        // Pass full profile data if available
-        handleVerificationSuccess(data.barcode, data.name, data);
-      } else {
-        handleVerificationFail(data.message || "Student ID not found in database.");
-      }
     } catch (error) {
       console.error("Error submitting image:", error);
-
-      let errorMessage = "Network error. Please check your connection and try again.";
-
-      if (error instanceof Error) {
-        if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
-          errorMessage = "Cannot connect to verification service. Please ensure the backend is running.";
-        } else if (error.message.includes("timeout") || error.message.includes("aborted")) {
-          errorMessage = "Request timed out. Please try again.";
-        } else {
-          errorMessage = `Error: ${error.message}`;
-        }
-      }
-
-      handleVerificationFail(errorMessage);
+      handleVerificationFail("An unexpected error occurred during demo verification.");
     }
   }
 
@@ -309,7 +265,6 @@ export default function AuthPage() {
     setStatus("idle");
     setMessage("");
     setVerificationFailed(false);
-    startCamera();
   }
 
   function stopAndReset() {
@@ -324,21 +279,10 @@ export default function AuthPage() {
     setVerificationFailed(false);
   }
 
-  // Development helper functions (commented out - not currently used)
-  // function handleDevBypass() {
-  //   setShowVerifiedAnimation(true);
-  //   setStatus("success");
-  //   setMessage("Verification Successful!");
-  //   setUserName("Developer");
-  //
-  //   setTimeout(() => {
-  //     router.push("/en/dashboard");
-  //   }, 2500);
-  // }
-  //
-  // function handleDevUpload() {
-  //   fileInputRef.current?.click();
-  // }
+  // Development helper function for upload
+  function handleDevUpload() {
+    fileInputRef.current?.click();
+  }
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -369,6 +313,17 @@ export default function AuthPage() {
     }
   }
 
+  function handleDevBypass() {
+    handleVerificationSuccess("DEMO-JURY-BYPASS", "Jury Member", {
+      uid: "DEMO-JURY-BYPASS",
+      fullName: "Jury Member",
+      name: "Jury Member",
+      age: 0,
+      allergy: "None",
+      number: "0000000000"
+    });
+  }
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
       <div className="orbital-gradient" aria-hidden />
@@ -384,17 +339,34 @@ export default function AuthPage() {
         aria-label="Upload Student ID image"
       />
 
-      {/* Floating Upload Button (Dev Tool) */}
-      <motion.button
-        onClick={() => fileInputRef.current?.click()}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg shadow-purple-500/50 transition hover:shadow-purple-400/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-300 opacity-20 hover:opacity-50"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        title="Upload ID Card (Dev Tool)"
-        aria-label="Upload ID card image for development"
-      >
-        <Upload className="h-6 w-6 text-white" />
-      </motion.button>
+      {/* Demo Bypass Button - Visible for Jury Presentation */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+        <motion.div
+          className="rounded-lg bg-amber-500/20 border border-amber-500/40 px-3 py-1.5 backdrop-blur-sm"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1, duration: 0.5 }}
+        >
+          <p className="text-xs text-amber-200 font-medium">
+            👇 For Jury: Skip Authentication
+          </p>
+        </motion.div>
+        <motion.button
+          onClick={handleDevBypass}
+          className="group relative overflow-hidden rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3 shadow-lg shadow-amber-500/50 transition-all hover:shadow-xl hover:shadow-amber-500/60 hover:scale-105"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.2, duration: 0.5 }}
+        >
+          <span className="relative z-10 flex items-center gap-2 text-sm font-bold text-white">
+            <Shield className="h-4 w-4" />
+            Demo Bypass
+          </span>
+          <span className="absolute inset-0 bg-white/20 opacity-0 transition group-hover:opacity-100" />
+        </motion.button>
+      </div>
 
 
 
@@ -521,6 +493,25 @@ export default function AuthPage() {
       </AnimatePresence>
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-4xl flex-col px-4 py-8 sm:px-6 lg:px-8">
+        {/* Jury Information Banner */}
+        <motion.div
+          className="mb-6 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/20 to-orange-500/20 p-4 backdrop-blur-sm"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/30">
+              <AlertCircle className="h-5 w-5 text-amber-300" />
+            </div>
+            <div className="flex-1">
+              <h3 className="mb-1 font-semibold text-amber-200">Prototype Demo Mode</h3>
+              <p className="text-sm text-amber-100/90">
+                <strong>For Jury Members:</strong> You can use the <strong>&quot;Demo Bypass&quot;</strong> button (bottom-right corner) to skip the authentication process and proceed directly to the dashboard.
+              </p>
+            </div>
+          </div>
+        </motion.div>
         {/* Header */}
         <motion.header
           className="mb-8 flex items-center gap-4"
@@ -594,15 +585,41 @@ export default function AuthPage() {
                       animate={{ opacity: 1 }}
                     >
                       <div className="space-y-4">
-                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-cyan-400/40 bg-cyan-400/10">
-                          <Camera className="h-10 w-10 text-cyan-400" />
+                        <div className="flex items-center justify-center gap-6">
+                          {/* Camera Button */}
+                          <motion.button
+                            onClick={startCamera}
+                            className="group flex flex-col items-center gap-2 transition-transform"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-cyan-400/40 bg-cyan-400/10 transition-all group-hover:border-cyan-400/70 group-hover:bg-cyan-400/20 group-hover:shadow-lg group-hover:shadow-cyan-400/30">
+                              <Camera className="h-10 w-10 text-cyan-400 transition-transform group-hover:scale-110" />
+                            </div>
+                            <p className="text-sm font-medium text-slate-300 group-hover:text-cyan-300">{"Camera"}</p>
+                          </motion.button>
+
+                          <div className="text-slate-500">{"or"}</div>
+
+                          {/* Upload Button */}
+                          <motion.button
+                            onClick={handleDevUpload}
+                            className="group flex flex-col items-center gap-2 transition-transform"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-purple-400/40 bg-purple-400/10 transition-all group-hover:border-purple-400/70 group-hover:bg-purple-400/20 group-hover:shadow-lg group-hover:shadow-purple-400/30">
+                              <Upload className="h-10 w-10 text-purple-400 transition-transform group-hover:scale-110" />
+                            </div>
+                            <p className="text-sm font-medium text-slate-300 group-hover:text-purple-300">{"Upload"}</p>
+                          </motion.button>
                         </div>
                         <div>
                           <p className="font-medium text-slate-200">
-                            {"Scanner Ready"}
+                            {"Scan or Upload Your ID Card"}
                           </p>
                           <p className="mt-1 text-sm text-slate-400">
-                            {"Tap Scan and point your card toward the camera"}
+                            {"Use camera to scan or upload from gallery"}
                           </p>
                         </div>
                       </div>
@@ -735,20 +752,7 @@ export default function AuthPage() {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                {status === "idle" && (
-                  <motion.button
-                    onClick={startCamera}
-                    className="group relative w-full overflow-hidden rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 px-6 py-4 text-base font-semibold text-white shadow-lg shadow-sky-500/40 transition"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      <Camera className="h-5 w-5" />
-                      {"Start Camera"}
-                    </span>
-                    <span className="absolute inset-0 bg-white/20 opacity-0 transition group-hover:opacity-100" />
-                  </motion.button>
-                )}
+
 
                 {status === "ready" && (
                   <motion.button

@@ -3,50 +3,63 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { getUserCookie, clearUserCookie } from "@/utils/cookies";
+import { getUserCookie, clearUserCookie, setUserCookie } from "@/utils/cookies";
+import Link from "next/link";
 import {
-    ArrowLeft,
     User,
-    Globe,
     Bell,
+    MessageSquare,
+    Mail,
+    FileText,
+    AlertTriangle,
     Shield,
-    CreditCard,
-    HelpCircle,
-    LogOut,
-    RefreshCw,
     Eye,
     Trash2,
-    FileText,
+    CreditCard,
     Download,
-    Mail,
-    MessageSquare,
-    AlertTriangle,
-    Edit,
-    Save,
-    X as XIcon,
+    HelpCircle,
+    LogOut,
+    ArrowLeft,
     CheckCircle,
+    X as XIcon,
+    RefreshCw,
+    Save,
+    Edit,
+    Globe
 } from "lucide-react";
-import Link from "next/link";
 
-export default function SettingsPage() {
+export default function HindiSettingsPage() {
     const router = useRouter();
-    const [profile, setProfile] = useState<{ fullName: string; uid: string; number: string; age: number | null; allergy: string | null } | null>(null);
+    const hasFetchedProfile = useRef(false);
 
+    const [profile, setProfile] = useState<{
+        fullName: string;
+        uid: string;
+        number: string | null;
+        age: number | null;
+        allergy: string | null;
+    } | null>(null);
+
+    const [editedProfile, setEditedProfile] = useState({
+        age: "",
+        allergy: "",
+        number: "",
+    });
+    const [isEditing, setIsEditing] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [isSaving, setIsSaving] = useState(false);
+
+    // Notifications State
     const [smsAlerts, setSmsAlerts] = useState(true);
     const [emailReceipts, setEmailReceipts] = useState(true);
     const [monthlySummary, setMonthlySummary] = useState(false);
     const [emergencyAlerts, setEmergencyAlerts] = useState(true);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedProfile, setEditedProfile] = useState<{ age: string; allergy: string; number: string }>({ age: "", allergy: "", number: "" });
-    const [isSaving, setIsSaving] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
 
-    const [currentDate, setCurrentDate] = useState<string>("");
-    const hasFetchedProfile = useRef(false);
-
-    useEffect(() => {
-        setCurrentDate(new Date().toLocaleString('hi-IN'));
-    }, []);
+    const currentDate = new Date().toLocaleDateString("hi-IN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    });
 
     useEffect(() => {
         // Prevent duplicate fetches in React StrictMode
@@ -59,31 +72,26 @@ export default function SettingsPage() {
             setProfile({
                 fullName: cachedProfile.fullName,
                 uid: cachedProfile.uid,
-                number: cachedProfile.number,
-                age: cachedProfile.age,
-                allergy: cachedProfile.allergy
+                number: cachedProfile.number || null,
+                age: cachedProfile.age || null,
+                allergy: cachedProfile.allergy || null
             });
             return; // Skip API call if we have cached data
         }
 
-        // Fallback to API if no cookie
+        // Fallback to local Session/Mock if no cookie
         const uid = sessionStorage.getItem("studentId");
         if (uid) {
             hasFetchedProfile.current = true;
-            fetch(`/api/proxy/api/student-profile/${encodeURIComponent(uid)}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data.success) {
-                        setProfile({
-                            fullName: data.fullName,
-                            uid: data.uid,
-                            number: data.number,
-                            age: data.age,
-                            allergy: data.allergy
-                        });
-                    }
-                })
-                .catch((err) => console.error("Failed to fetch profile", err));
+
+            // Mock Data
+            setProfile({
+                fullName: sessionStorage.getItem("studentFirstName") || "छात्र",
+                uid: uid,
+                number: "",
+                age: null,
+                allergy: null
+            });
         }
     }, []);
 
@@ -118,33 +126,34 @@ export default function SettingsPage() {
         setSuccessMessage("");
 
         try {
-            const response = await fetch("/api/proxy/api/update-profile", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    uid: profile.uid,
-                    age: editedProfile.age ? Number(editedProfile.age) : null,
-                    allergy: editedProfile.allergy || null,
-                    number: editedProfile.number,
-                }),
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const updatedProfile = {
+                ...profile,
+                age: editedProfile.age ? Number(editedProfile.age) : null,
+                allergy: editedProfile.allergy || null,
+                number: editedProfile.number || null,
+            };
+
+            // Update local profile state
+            setProfile(updatedProfile);
+
+            // Update Cookie to persist changes
+            const currentCookie = getUserCookie();
+            setUserCookie({
+                uid: updatedProfile.uid,
+                fullName: updatedProfile.fullName,
+                name: currentCookie?.name || "छात्र", // Preserve first name if possible
+                age: updatedProfile.age,
+                allergy: updatedProfile.allergy,
+                number: updatedProfile.number || ""
             });
 
-            const data = await response.json();
+            setIsEditing(false);
+            setSuccessMessage("प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!");
+            setTimeout(() => setSuccessMessage(""), 3000);
 
-            if (data.success) {
-                // Update local profile state
-                setProfile({
-                    ...profile,
-                    age: editedProfile.age ? Number(editedProfile.age) : null,
-                    allergy: editedProfile.allergy || null,
-                    number: editedProfile.number,
-                });
-                setIsEditing(false);
-                setSuccessMessage("प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!");
-                setTimeout(() => setSuccessMessage(""), 3000);
-            } else {
-                alert(data.message || "प्रोफ़ाइल अपडेट करने में विफल");
-            }
         } catch (error) {
             console.error("Error updating profile:", error);
             alert("आपकी प्रोफ़ाइल अपडेट करते समय एक त्रुटि हुई");

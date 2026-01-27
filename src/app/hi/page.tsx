@@ -735,17 +735,11 @@ export default function HindiHome() {
                                             setIsSubmittingContact(true);
                                             setContactError("");
                                             try {
-                                                const res = await fetch("http://127.0.0.1:8000/api/contact", {
-                                                    method: "POST",
-                                                    headers: { "Content-Type": "application/json" },
-                                                    body: JSON.stringify(contactForm),
-                                                    signal: AbortSignal.timeout(5000)
-                                                });
-                                                if (res.ok) {
-                                                    setContactSubmitted(true);
-                                                } else {
-                                                    throw new Error("Failed to send message");
-                                                }
+                                                // Simulate network delay
+                                                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                                                // Mock success
+                                                setContactSubmitted(true);
                                             } catch (err) {
                                                 console.error("Contact form error:", err);
                                                 setContactError("संदेश भेजने में विफल। कृपया पुन: प्रयास करें।");
