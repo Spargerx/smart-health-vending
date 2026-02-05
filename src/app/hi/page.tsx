@@ -40,9 +40,9 @@ export default function HindiHome() {
     const [contactError, setContactError] = useState("");
 
     const essentials = [
-        "बैंडेज और ड्रेसिंग",
-        "एंटीसेप्टिक और क्रीम",
-        "दर्द निवारक और बाम",
+        "मेडिकल-ग्रेड बैंडेज और स्टेराइल कॉटन",
+        "एंटीसेप्टिक वाइप्स, जैल और स्प्रे",
+        "पुन: उपयोग योग्य कोल्ड पैक और त्वचा-सुरक्षित टेप",
     ];
 
     const previewSteps = [
@@ -153,7 +153,7 @@ export default function HindiHome() {
                             priority
                         />
                         <div>
-                            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-slate-300">क्योरजीनी</p>
+                            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-slate-300">क्योरजेनी (CureGenie)</p>
                             <p className="text-xs text-slate-400">स्मार्ट हेल्थ असिस्टेंस</p>
                         </div>
                     </div>
@@ -177,14 +177,14 @@ export default function HindiHome() {
                 <div className={`mt-12 space-y-8 transition-all duration-500 ${isNavigating || isLanguageSwitching ? "translate-y-4 opacity-50" : "opacity-100"}`}>
                     <div className="space-y-6 lg:max-w-4xl">
                         <h1 className="text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl">
-                            आपका स्मार्ट<br />
-                            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                                हेल्थ असिस्टेंट
-                            </span>
+                            क्योरजेनी में आपका स्वागत है
                         </h1>
-                        <h2 className="max-w-2xl text-xl font-light text-slate-200 sm:text-xl">
-                            AI-संचालित प्राथमिक उपचार सलाह और आवश्यक स्वास्थ्य उत्पादों तक त्वरित पहुँच।
+                        <h2 className="max-w-2xl text-2xl font-semibold text-slate-200 sm:text-2xl mb-4">
+                            स्मार्ट हेल्थ असिस्टेंस वेंडिंग मशीन
                         </h2>
+                        <p className="max-w-3xl text-lg font-light text-slate-300 sm:text-lg">
+                            क्योरजेनी इंटेलिजेंट ट्राइएज, रिमोट चिकित्सकों और तुरंत उपलब्ध आवश्यक मेडिकल वस्तुओं को एक साथ लाता है — ताकि आप कुछ ही सेकंड में सही कदम उठा सकें।
+                        </p>
                     </div>
 
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
@@ -210,8 +210,9 @@ export default function HindiHome() {
                             </motion.button>
                         </div>
                     </div>
-                    <p className="text-l text-slate-400">
-                        केवल बुनियादी प्राथमिक चिकित्सा के लिए। आपातकालीन स्थिति में 112 डायल करें।
+                    <p className="text-base text-slate-400">
+                        शुरू करने के लिए "शुरू करें" पर टैप करें।<br />
+                        चिकित्सक द्वारा समीक्षित सलाह के लिए मार्गदर्शन शुल्क ₹10 है।
                     </p>
                 </div>
 
@@ -223,13 +224,21 @@ export default function HindiHome() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                     >
-                        <h2 className="text-sm uppercase tracking-[0.35em] text-cyan-200">सुरक्षा पहले</h2>
-                        <p className="mt-4 text-lg text-slate-100">
-                            यह मशीन केवल छोटी-मोटी चोटों और सामान्य स्वास्थ्य समस्याओं के लिए है।
-                        </p>
-                        <p className="mt-3 text-sm text-slate-300">
-                            गंभीर स्थितियों के लिए कृपया तुरंत डॉक्टर से संपर्क करें।
-                        </p>
+                        <h2 className="text-sm uppercase tracking-[0.35em] text-cyan-200">आपकी सुरक्षा के लिए निर्मित</h2>
+                        <div className="mt-4 space-y-3">
+                            <p className="text-base text-slate-100">
+                                यह मशीन केवल प्राथमिक उपचार के लिए है।
+                            </p>
+                            <p className="text-sm text-slate-300">
+                                गंभीर या आपातकालीन मामलों में, उपयोगकर्ता को तुरंत पास के डॉक्टर या अस्पताल के लिए निर्देशित किया जाता है।
+                            </p>
+                            <p className="text-sm text-slate-300">
+                                हर अनुशंसा की समीक्षा रिमोट मेडिकल विशेषज्ञों द्वारा की जाती है।
+                            </p>
+                            <p className="text-sm text-slate-300">
+                                उच्च कंट्रास्ट डिज़ाइन और बड़े टैप बटन सभी उपयोगकर्ताओं के लिए अनुभव को सरल और सुलभ बनाते हैं।
+                            </p>
+                        </div>
                     </motion.div>
 
                     <motion.div
@@ -239,9 +248,10 @@ export default function HindiHome() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.15 }}
                     >
-                        <h2 className="text-sm uppercase tracking-[0.35em] text-cyan-200">हेल्थ हब</h2>
+                        <h2 className="text-sm uppercase tracking-[0.35em] text-cyan-200">प्राथमिक उपचार आवश्यक वस्तुओं का केंद्र</h2>
                         <p className="mt-4 text-lg text-slate-100">
-                            सभी आवश्यक प्राथमिक चिकित्सा सामग्री एक ही जगह पर उपलब्ध।
+                            बिना प्रिस्क्रिप्शन, बिना इंतज़ार —<br />
+                            प्राथमिक उपचार की वस्तुएं तुरंत खरीदें।
                         </p>
                         <ul className="mt-4 space-y-2 text-slate-200">
                             {essentials.map((item) => (
@@ -259,18 +269,20 @@ export default function HindiHome() {
                 <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-8">
                     <nav className="flex flex-wrap gap-4">
                         <button onClick={() => setShowTerms(true)} className="transition hover:text-white">
-                            नियम और शर्तें
+                            नियम और गोपनीयता
                         </button>
                         <button onClick={() => setShowSafety(true)} className="transition hover:text-white">
-                            सुरक्षा जानकारी
+                            सुरक्षा संबंधी जानकारी
                         </button>
                         <button onClick={() => setShowContact(true)} className="transition hover:text-white">
-                            संपर्क करें
+                            सहायता से संपर्क करें
                         </button>
                     </nav>
-                    <p className="text-xs text-slate-500">
-                        © 2024 क्योरजीनी. सर्वाधिकार सुरक्षित।
-                    </p>
+                    <div className="text-xs text-slate-500">
+                        <p className="mb-2">⚠️ महत्वपूर्ण सूचना:</p>
+                        <p>इस मशीन का उपयोग आपातकालीन सेवाओं के विकल्प के रूप में न करें।</p>
+                        <p>यदि स्थिति जीवन के लिए खतरा हो, तो तुरंत अपने स्थानीय आपातकालीन नंबर पर कॉल करें।</p>
+                    </div>
                 </div>
             </footer>
 
